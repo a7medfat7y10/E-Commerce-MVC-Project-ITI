@@ -1,52 +1,69 @@
-﻿
+﻿@using Microsoft.Extensions.Options
+@using ECommerce.Models;
+@inject IOptions<StripSetting> Stripee
+<div style="display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden;">
+    <div style="display: flex; align-items: center; flex-wrap: wrap; max-width: 100%;">
 
+        <span style="margin-right: 2rem;">
+            <form action="/paypal/success" method="POST">
+                <input type="text" name="test" value="50" hidden />
+                <script src="//checkout.stripe.com/v2/checkout.js"
+                        class="stripe-button"
+                        data-key="@Stripee.Value.PublishableKey"
+                        data-locale="auto"
+                        data-description="test Charge"
+                        @*data-amount="100"*@>
+                </script>
+            </form>
+        </span>
 
-<button type="submit" id="paypal-btn"></button>
+        <span>
+            <button type="submit" id="paypal-btn"></button>
 
-<script>
-    var orderTotal = 100;
-</script>
+            <script>
+                var orderTotal = 100;
+            </script>
 
-@section Scripts{
-    <script src="https://www.paypalobjects.com/api/checkout.js"></script>
-    <script>
+            @section Scripts{
+                <script src="https://www.paypalobjects.com/api/checkout.js"></script>
+                <script>
+                    let _total = parseFloat(orderTotal.toFixed(2));
 
+                    paypal.Button.render({
+                        env: 'sandbox',
+                        client: {
+                            sandbox: 'ATOYRbaMQDeT4tUuhvpKZv-4tQc-xgH2ZKmvbiE0HQOFJoFPlEKxPUOggpSgCW3vGx-NFxew2E-MWekQ',
+                        },
+                        locale: 'en_US',
+                        style: {
+                            size: 'small',
+                            color: 'gold',
+                            shape: 'pill'
+                        },
+                        commit: true,
 
-        let _total = parseFloat(orderTotal.toFixed(2));
+                        payment: function (data, actions) {
+                            return actions.payment.create({
+                                transactions: [{
+                                    amount: {
+                                        total: _total,
+                                        currency: 'USD'
+                                    }
+                                }]
+                            });
+                        },
 
-
-        paypal.Button.render({
-            env: 'sandbox',
-            client: {
-                sandbox: 'ATOYRbaMQDeT4tUuhvpKZv-4tQc-xgH2ZKmvbiE0HQOFJoFPlEKxPUOggpSgCW3vGx-NFxew2E-MWekQ',
-
-            },
-            locale: 'en_US',
-            style: {
-                size: 'small',
-                color: 'gold',
-                shape: 'pill'
-            },
-            commit: true,
-
-            payment: function (data, actions) {
-                return actions.payment.create({
-                    transactions: [{
-                        amount: {
-                            total: _total,
-                            currency: 'USD'
+                        onAuthorize: function (data, actions) {
+                            actions.payment.execute()
+                            var url = '@Url.Action("Success", "PayPal", new {})';
+                            window.location.href = url;
                         }
-                    }]
-                });
-            },
 
-            onAuthorize: function (data, actions) {
-                actions.payment.execute()
-                var url = '@Url.Action("Success", "PayPal", new {})';
-                window.location.href = url;
+                    }, '#paypal-btn');
+                </script>
             }
+        </span>
 
-        }, '#paypal-btn');
-    </script>
-    }
+    </div>
+</div>
 
