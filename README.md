@@ -2,6 +2,8 @@
 
 This project is an Amazon eCommerce website built with ASP.NET MVC Core 5. It features a full authentication system with roles for Admins, Users, and Sellers.
 
+https://github.com/a7medfat7y10/E-Commerce-MVC-Project-ITI/assets/54340387/98582be8-6f86-4582-80be-55d0f79d67ed
+
 ## Features
 - Full authentication system with roles for Admins, Users, and Sellers
 - Payment system using PayPal
